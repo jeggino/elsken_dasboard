@@ -148,67 +148,6 @@ db_2 = deta.Base("df_authentication")
 db_content_2 = db_2.fetch().items 
 df_references = pd.DataFrame(db_content_2)
 
-@st.dialog(" ")
-def update_item():
-
-  datum = st.date_input("Datum","today")
-  nine_hours_from_now = datetime.now() + timedelta(hours=2)
-  time = st.time_input("Tijd", nine_hours_from_now)
-  
-  if st.session_state.project['opdracht'] == 'Vleermuizen':
-
-    sp = st.selectbox("Soort", BAT_NAMES)
-    gedrag = st.selectbox("Gedrag", BAT_BEHAVIOURS) 
-    functie = st.selectbox("Functie", BAT_FUNCTIE) 
-    verblijf = st.selectbox("Verblijf", BAT_VERBLIJF) 
-    aantal = st.number_input("Aantal", min_value=1)
-
-  elif st.session_state.project['opdracht'] == 'Vogels':
-  
-    sp = st.selectbox("Soort", BIRD_NAMES)
-    gedrag = st.selectbox("Gedrag", BIRD_BEHAVIOURS) 
-    functie = st.selectbox("Functie", BIRD_FUNCTIE) 
-    verblijf = st.selectbox("Verblijf", BIRD_VERBLIJF) 
-    aantal = st.number_input("Aantal", min_value=1)
-  
-  elif st.session_state.project['opdracht'] == 'Vleermuiskast':
-    
-    functie = st.selectbox("Voorwaarde", VLEERMUISKAST_OPTIONS)
-    bat_names = ["onbekend"] + BAT_NAMES
-    sp = st.selectbox("Soort", bat_names) 
-    gedrag = None
-    verblijf = None
-    aantal = st.number_input("Aantal", min_value=1)
-  
-  elif st.session_state.project['opdracht'] == 'Camera':
-    
-    functie = st.selectbox("Camera", CAMERA_OPTIONS)
-    sp = None 
-    gedrag = None
-    verblijf = None
-    aantal = st.number_input("Aantal", min_value=1)
-  
-  elif st.session_state.project['opdracht'] == 'Rat val':
-    
-    functie = st.selectbox("Rat val", RAT_VAL_OPTIONS)
-    sp = None 
-    gedrag = None
-    verblijf = None
-    aantal = st.number_input("Aantal", min_value=1)
-  
-  opmerking = st.text_input("", placeholder="Vul hier een opmerking in ...")
-
-
-  update = {"datum":str(datum),"time":str(time),"sp":sp,
-            "aantal":aantal, "gedrag":gedrag, "functie":functie, 
-            "verblijf":verblijf,"opmerking":opmerking}
-    
-  if st.button("**Update**",use_container_width=True): 
-    db.update(update,id)
-    st.rerun()
-
-
-
 
 def logIn():
     name = st.selectbox("Wie ben je?",df_references["username"].tolist(),index=None)  
@@ -226,24 +165,9 @@ def logIn():
         else:
             st.markdown(f"Sorry {name.split()[0]}, het wachtwoord is niet correct.")
 
-def project():
-    st.subheader(f"Welkom {st.session_state.login['name'].split()[0]}!!",divider='grey')
-    index_project = df_references[df_references['username']==st.session_state.login["name"]].index[0]
-    project_list = df_references.loc[index_project,"project"]
-    project = st.selectbox("Aan welke project ga je werken?",project_list,label_visibility="visible")
-    opdracht = st.selectbox("Aan welke opdracht ga je werken?",DICTIONARY_PROJECTS[project],label_visibility="visible")
-    if st.button("begin"):
-         st.session_state.project = {"project_name": project,"opdracht": opdracht}
-         st.rerun()
 def logOut():
     if st.button("logOut",use_container_width=True):
         del st.session_state.login
-        del st.session_state.project     
-        st.rerun()
-
-def logOut_project():
-    if st.button("Opdracht wijzigen",use_container_width=True):
-        del st.session_state.project
         st.rerun()
         
 
@@ -252,18 +176,12 @@ if "login" not in st.session_state:
     logIn()
     st.stop()
 
-
-if 'project' not in st.session_state:  
-    project()
-    st.stop()
-
 #______________NEW___________________
 
 
 
 with st.sidebar:
     # st.markdown(f"Hallo **{st.session_state.login['name']}**, je gaat werken aan de **{st.session_state.project['project_name']}** project, met de **{st.session_state.project['opdracht']}** opdracht. :rainbow[VEEL SUCCES!!!]")
-    logOut_project()
     logOut()
     st.divider()
 
@@ -279,7 +197,7 @@ try:
     df_point = pd.DataFrame(db_content)
     
        
-    df_2 = df_point[df_point['soortgroup']==st.session_state.project['opdracht']]
+    df_2 = df_point#[df_point['soortgroup']==st.session_state.project['opdracht']]
     df_2["datum_2"] = pd.to_datetime(df_2["datum"]).dt.date
     st.sidebar.subheader("Filter op",divider=False)
     d = st.sidebar.date_input(
@@ -293,10 +211,10 @@ try:
     
     df_2 = df_2[(df_2['datum_2']>=d[0]) & (df_2['datum_2']<=d[1])]
     
-    if st.session_state.project['opdracht'] in ["Vleermuizen","Vogels"]:
-        species_filter_option = df_2["sp"].unique()
-        species_filter = st.sidebar.multiselect("Sorten",species_filter_option,species_filter_option)
-        df_2 = df_2[df_2['sp'].isin(species_filter)]
+    # if st.session_state.project['opdracht'] in ["Vleermuizen","Vogels"]:
+    #     species_filter_option = df_2["sp"].unique()
+    #     species_filter = st.sidebar.multiselect("Sorten",species_filter_option,species_filter_option)
+    #     df_2 = df_2[df_2['sp'].isin(species_filter)]
 
     st.sidebar.divider()
 
