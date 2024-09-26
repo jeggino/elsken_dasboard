@@ -188,8 +188,8 @@ with st.sidebar:
     
     
 
-IMAGE = "image/logo.png"
-st.logo(IMAGE,  link=None, icon_image=None)
+# IMAGE = "image/logo.png"
+# st.logo(IMAGE,  link=None, icon_image=None)
 
 try:
 
