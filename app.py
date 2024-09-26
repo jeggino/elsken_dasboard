@@ -14,6 +14,7 @@ import random
 from deta import Deta
 
 from credencials import *
+from https://github.com/jeggino/GiggiGIS/tree/cdbeaa2c853b6b02bbbf31755408cb4dd8dce0b3/icons import *
 
 
 # ---LAYOUT---
